@@ -28,7 +28,7 @@ class Database{
         // echo $query;
         try{
             $stmt = $this->conn->prepare($query);
-            $stmt->execute($binds);
+            $stmt->execute($binds);  // executa a consulta com os parâmetros
             return $stmt;
         }
         catch(PDOException $err){
@@ -39,9 +39,9 @@ class Database{
     public function insert($values){
         // quebrar o array associativo que veio como parametro
         $fields = array_keys($values);
-
+        // cria uma lista de "?" para serem usados como placeholders("espaços reservados" para valores que serão adicionados)
         $binds = array_pad([],count($fields),'?');
-
+         // monta a consulta SQL para inserir os dados na tabela
         $query = 'INSERT INTO ' .$this->table . '('.implode(',',$fields).') VALUES ('.implode(',',$binds).')';
 
         $res = $this->execute($query,array_values($values));
@@ -52,18 +52,18 @@ class Database{
             return false;
         }
     }
-
+    // seleciona dados da tabela atual:
     public function select($where =  null,$order = null, $limit = null, $fields = '*'){
 
         $where = strlen($where) ? 'WHERE ' .$where : '';
         $order = strlen($order) ? 'ORDER BY ' .$order : '';
         $limit = strlen($limit) ? 'LIMIT ' .$limit : '';
-
+        // monta a query de seleção
         $query = 'SELECT' .$fields. ' FROM ' .$this->table. ' ' . $where. ' ' .$order . ' '.$limit;
 
         return $this->execute($query);
     }
-
+    // seleciona um único registro da tabela pelo ID:
     public function select_by_id($where =  null,$order = null, $limit = null, $fields = '*'){
 
         $where = strlen($where) ? 'WHERE ' .$where : '';
@@ -93,8 +93,8 @@ class Database{
 
         $del = $this->execute($query);
 
-        $del = $del->rowCount();
-        if($del == 1){
+        $del = $del->rowCount();  // conta quantas linhas foram afetadas:
+        if($del == 1){  // retorna true se exatamente um registro foi excluído:
             return true;
         }else{
             return false;
